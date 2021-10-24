@@ -34,37 +34,38 @@ namespace MidpointDisplacement
             }
         }
 
-        
-        
-        
-        void GeneratePoints(Point h1, Point h2, int countPoints, float R)
+        Point H1 = new Point(0, 0);
+        Point H2 = new Point(0, 0);
+        LinkedList<Point> points = new LinkedList<Point>();
+        Random rand = new Random(1);
+        void CreateList()
         {
-            LinkedList<Point> points = new LinkedList<Point>();
-            points.AddFirst(h1);
-            points.AddLast(h2);
+            
+            points.AddFirst(H1);
+            points.AddLast(H2);
+        }
+
+        void GeneratePoints(Point h1, Point h2, float R)
+        {
+            
             //int i = countPoints;
             var first_point = points.First;
             Point h = new Point(0, 0);
-            int c = countPoints - 2;
-            Random rand = new Random();
-            while (c != 0)
-            {
-                first_point = points.First;
-                while (first_point != points.Last && c != 0)
-                {                    
-                    var next_point = first_point.Next;
-                    var dist = Math.Sqrt(Math.Pow(next_point.Value.x - first_point.Value.x, 2) + Math.Pow(next_point.Value.y - first_point.Value.y, 2));
-                    h.x = (next_point.Value.x - first_point.Value.x) / 2 + first_point.Value.x;
-                    h.y = (next_point.Value.y - first_point.Value.y) / 2 + first_point.Value.y + rand.Next(-(int)(R * dist), (int)(R * dist));
-                    Point hnew = new Point(h.x, h.y);
-                    //hnew.x = h.x;
-                    //hnew.y = h.y;
-                    points.AddAfter(first_point, hnew);
-                    c--;
-                    first_point = next_point;
-                }
+            
+            first_point = points.First;
+            while (first_point != points.Last)
+            {                    
+                var next_point = first_point.Next;
+                var dist = Math.Sqrt(Math.Pow(next_point.Value.x - first_point.Value.x, 2) + Math.Pow(next_point.Value.y - first_point.Value.y, 2));
+                h.x = (next_point.Value.x - first_point.Value.x) / 2 + first_point.Value.x;
+                h.y = (next_point.Value.y - first_point.Value.y) / 2 + first_point.Value.y + rand.Next(-(int)(R * dist), (int)(R * dist));
+                Point hnew = new Point(h.x, h.y);
+                //hnew.x = h.x;
+                //hnew.y = h.y;
+                points.AddAfter(first_point, hnew);
+                first_point = next_point;
             }
-
+            g.Clear(Color.White);
             for (var iter = points.First; iter != points.Last; iter = iter.Next)
             {
                 g.DrawLine(myPen, iter.Value.x, iter.Value.y, iter.Next.Value.x, iter.Next.Value.y);
@@ -84,9 +85,10 @@ namespace MidpointDisplacement
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Point H1 = new Point(0, pictureBox1.Height / 2);
-            Point H2 = new Point(pictureBox1.Width - 1, pictureBox1.Height / 2 + 20);
-            int Intensive = 60;
+            H1.x = 0;
+            H1.y = pictureBox1.Height / 2;
+            H2.x = pictureBox1.Width - 1;
+            H2.y = pictureBox1.Height / 2 - 20;
             float R = 0.4f;
             if(textBox1.Text != "")
             {
@@ -104,19 +106,17 @@ namespace MidpointDisplacement
             {
                 H2.y = int.Parse(textBox4.Text);
             }
-            if (textBox5.Text != "")
-            {
-                Intensive = int.Parse(textBox5.Text);
-            }
             if (textBox6.Text != "")
             {
                 R = float.Parse(textBox6.Text);
             }
-            GeneratePoints(H1, H2, Intensive, R);
+            CreateList();
+            GeneratePoints(H1, H2, R);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            points = new LinkedList<Point>();
             g.Clear(Color.White);
             pictureBox1.Image = bmp;
         }
@@ -149,12 +149,6 @@ namespace MidpointDisplacement
                 e.Handled = true;
         }
 
-        private void textBox5_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            char number = e.KeyChar;
-            if (!(Char.IsDigit(number) || char.IsControl(number)))
-                e.Handled = true;
-        }
 
         private void textBox6_KeyPress(object sender, KeyPressEventArgs e)
         {
